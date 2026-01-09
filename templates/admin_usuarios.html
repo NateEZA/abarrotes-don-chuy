@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block titulo %}Gestión de Usuarios - Abarrotes Don Chuy{% endblock %}
+{% block contenido %}
+<h1 style="color: #2c3e50; margin-bottom: 2rem;">👥 Gestión de Usuarios</h1>
+
+<div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <table class="tabla">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Registrado</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.id }}</td>
+                <td>{{ usuario.nombre_usuario }}</td>
+                <td>{{ usuario.email }}</td>
+                <td>
+                    <span class="rol-badge rol-{{ usuario.rol|lower }}">
+    {{ usuario.rol }}
+</span>
+                </td>
+                <td>{{ usuario.fecha_creacion.strftime('%d/%m/%Y') }}</td>
+                <td>
+                    {# Lógica para proteger al Super Admin 'Nate' #}
+                    {% if usuario.nombre_usuario != 'Nate' %}
+                    <form method="POST" action="{{ url_for('eliminar_usuario', id_usuario=usuario.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-peligro" style="padding: 0.5rem 1rem;" onclick="return confirm('¿Estás seguro?')">Eliminar</button>
+                    </form>
+                    {% else %}
+                    <span style="color: #7f8c8d; font-style: italic;">Super Admin</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{{ url_for('panel_admin') }}" class="btn btn-secundario">← Volver al Panel</a>
+</div>
+{% endblock %}

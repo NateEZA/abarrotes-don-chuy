@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block titulo %}Checkout - Abarrotes Don Chuy{% endblock %}
+{% block contenido %}
+<h1 style="color: #2c3e50; margin-bottom: 2rem;">💳 Finalizar Compra</h1>
+<form method="POST" action="{{ url_for('checkout') }}">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <h2 style="color: #2c3e50; margin-bottom: 1.5rem;">📍 Dirección de Envío</h2>
+            {% if direcciones %}
+                <div class="grupo-formulario">
+                    <label>Selecciona una dirección:</label>
+                    {% for direccion in direcciones %}
+                    <div style="padding: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 1rem; cursor: pointer;">
+                        <input type="radio" name="id_direccion" value="{{ direccion.id }}" {% if direccion.es_predeterminada %}checked{% endif %} required style="margin-right: 0.5rem;">
+                        <strong>{{ direccion.calle }}</strong><br>
+                        <span style="color: #7f8c8d;">{{ direccion.ciudad }}, {{ direccion.estado }} {{ direccion.codigo_postal }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: #7f8c8d;">No tienes direcciones guardadas.</p>
+                <a href="{{ url_for('agregar_direccion') }}" class="btn btn-secundario">Agregar Dirección</a>
+            {% endif %}
+        </div>
+        <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <h2 style="color: #2c3e50; margin-bottom: 1.5rem;">💳 Método de Pago</h2>
+            {% if metodos_pago %}
+                <div class="grupo-formulario">
+                    <label>Selecciona un método:</label>
+                    {% for pago in metodos_pago %}
+                    <div style="padding: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 1rem; cursor: pointer;">
+                        <input type="radio" name="id_pago" value="{{ pago.id }}" {% if pago.es_predeterminado %}checked{% endif %} required style="margin-right: 0.5rem;">
+                        <strong>****{{ pago.ultimos4_tarjeta }}</strong><br>
+                        <span style="color: #7f8c8d;">{{ pago.titular_tarjeta }} - Vence: {{ "%02d"|format(pago.mes_vencimiento) }}/{{ pago.anio_vencimiento }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: #7f8c8d;">No tienes métodos de pago.</p>
+                <a href="{{ url_for('agregar_metodo_pago') }}" class="btn btn-secundario">Agregar Tarjeta</a>
+            {% endif %}
+        </div>
+    </div>
+    {% if direcciones and metodos_pago %}
+    <div style="text-align: center; margin-top: 2rem;">
+        <button type="submit" class="btn btn-primario" style="padding: 1rem 3rem; font-size: 1.2rem;">Confirmar Compra</button>
+    </div>
+    {% endif %}
+</form>
+{% endblock %}

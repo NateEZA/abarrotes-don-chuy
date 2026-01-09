@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titulo %}Iniciar Sesión - Abarrotes Don Chuy{% endblock %}
+{% block contenido %}
+<div style="max-width: 500px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <h1 style="text-align: center; color: #2c3e50; margin-bottom: 2rem;">Iniciar Sesión</h1>
+    <form method="POST" action="{{ url_for('login') }}">
+        <div class="grupo-formulario">
+            <label for="nombre_usuario">Nombre de Usuario</label>
+            <input type="text" id="nombre_usuario" name="nombre_usuario" class="control-formulario" required autofocus>
+        </div>
+        <div class="grupo-formulario">
+            <label for="contrasena">Contraseña</label>
+            <input type="password" id="contrasena" name="contrasena" class="control-formulario" required>
+        </div>
+        <button type="submit" class="btn btn-primario btn-bloque">Iniciar Sesión</button>
+    </form>
+    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e0e0e0;">
+        <p style="text-align: center; color: #7f8c8d; margin-bottom: 1rem;">O iniciar sesión con:</p>
+        <button class="btn btn-secundario btn-bloque" disabled>🔐 Iniciar con Google (Próximamente)</button>
+    </div>
+    <p style="text-align: center; margin-top: 1.5rem; color: #7f8c8d;">
+        ¿No tienes cuenta? <a href="{{ url_for('registro') }}" style="color: #3498db; text-decoration: none;">Regístrate aquí</a>
+    </p>
+</div>
+{% endblock %}
