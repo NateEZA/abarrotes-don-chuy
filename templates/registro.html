@@ -36,12 +36,11 @@
         <button type="submit" class="btn btn-primario btn-bloque">Registrarse</button>
     </form>
     
-    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e0e0e0;">
-        <p style="text-align: center; color: #7f8c8d; margin-bottom: 1rem;">O registrarse con:</p>
-        <button class="btn btn-secundario btn-bloque" disabled>
-            🔐 Registrarse con Google (Próximamente)
-        </button>
-    </div>
+    <div class="mb-3">
+    <label class="form-label">Palabra Clave de Recuperación</label>
+    <input type="text" class="form-control" name="palabra_clave" placeholder="Ej. El nombre de mi gato" required>
+    <small class="text-muted">Necesitarás esto si olvidas tu contraseña.</small>
+</div>
     
     <p style="text-align: center; margin-top: 1.5rem; color: #7f8c8d;">
         ¿Ya tienes cuenta? <a href="{{ url_for('login') }}" style="color: #3498db; text-decoration: none;">Iniciar Sesión</a>

@@ -14,7 +14,7 @@ class Usuario(db.Model):
     rol = db.Column(db.String(20), nullable=False)  # Admin, Vendedor, Comprador
     foto_perfil = db.Column(db.String(255), default='default.jpg')
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
-    
+    palabra_clave = db.Column(db.String(100), nullable=False, default='sin_clave')
     # Relaciones
     productos = db.relationship('Producto', backref='vendedor', lazy=True, cascade='all, delete-orphan')
     ordenes = db.relationship('Orden', backref='comprador', lazy=True, cascade='all, delete-orphan')

@@ -93,6 +93,8 @@ def registro():
         email = request.form.get('email')
         contrasena = request.form.get('contrasena')
         rol = request.form.get('rol', 'Comprador')
+        # NUEVO: Obtener palabra clave
+        palabra_clave = request.form.get('palabra_clave')
         
         # Validar que el usuario no exista
         if Usuario.query.filter_by(nombre_usuario=nombre_usuario).first():
@@ -109,8 +111,13 @@ def registro():
             flash(mensaje, 'danger')
             return redirect(url_for('registro'))
         
-        # Crear usuario
-        usuario = Usuario(nombre_usuario=nombre_usuario, email=email, rol=rol)
+        # Crear usuario (con palabra clave)
+        usuario = Usuario(
+            nombre_usuario=nombre_usuario, 
+            email=email, 
+            rol=rol,
+            palabra_clave=palabra_clave # <-- GUARDAR CAMPO
+        )
         usuario.establecer_contrasena(contrasena)
         
         db.session.add(usuario)
@@ -145,6 +152,40 @@ def login():
             flash('Credenciales inválidas', 'danger')
     
     return render_template('login.html')
+
+# --- NUEVA RUTA: RECUPERAR CONTRASEÑA ---
+@app.route('/recuperar', methods=['GET', 'POST'])
+def recuperar_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        palabra_clave_ingresada = request.form.get('palabra_clave')
+        nueva_contrasena = request.form.get('nueva_contrasena')
+        
+        usuario = Usuario.query.filter_by(email=email).first()
+        
+        if not usuario:
+            flash('El correo no está registrado.', 'danger')
+            return redirect(url_for('recuperar_password'))
+            
+        # Verificar palabra clave (Coincidencia exacta)
+        if usuario.palabra_clave != palabra_clave_ingresada:
+            flash('La palabra clave es incorrecta.', 'danger')
+            return redirect(url_for('recuperar_password'))
+            
+        # Validar la nueva contraseña
+        valido, mensaje = validar_contrasena(nueva_contrasena)
+        if not valido:
+            flash(mensaje, 'danger')
+            return redirect(url_for('recuperar_password'))
+            
+        # Actualizar contraseña
+        usuario.establecer_contrasena(nueva_contrasena)
+        db.session.commit()
+        
+        flash('¡Contraseña actualizada correctamente! Inicia sesión.', 'success')
+        return redirect(url_for('login'))
+        
+    return render_template('recuperar.html')
 
 @app.route('/cerrar-sesion')
 def cerrar_sesion():
@@ -215,12 +256,12 @@ def panel_admin():
     ordenes_recientes = Orden.query.order_by(Orden.fecha_creacion.desc()).limit(10).all()
     
     return render_template('panel_admin.html', 
-                         total_usuarios=total_usuarios,
-                         total_productos=total_productos,
-                         total_ordenes=total_ordenes,
-                         ingresos_totales=ingresos_totales,
-                         productos_pendientes=productos_pendientes,
-                         ordenes_recientes=ordenes_recientes)
+                          total_usuarios=total_usuarios,
+                          total_productos=total_productos,
+                          total_ordenes=total_ordenes,
+                          ingresos_totales=ingresos_totales,
+                          productos_pendientes=productos_pendientes,
+                          ordenes_recientes=ordenes_recientes)
 
 @app.route('/admin/usuarios')
 @rol_requerido(['Admin'])
@@ -301,9 +342,9 @@ def panel_vendedor():
             ingresos_totales += item.precio * item.cantidad
     
     return render_template('panel_vendedor.html', 
-                         productos=productos,
-                         total_ventas=total_ventas,
-                         ingresos_totales=ingresos_totales)
+                          productos=productos,
+                          total_ventas=total_ventas,
+                          ingresos_totales=ingresos_totales)
 
 @app.route('/vendedor/agregar-producto', methods=['GET', 'POST'])
 @rol_requerido(['Vendedor'])

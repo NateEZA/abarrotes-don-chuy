@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Recuperar Contraseña</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Correo Electrónico registrado</label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tu Palabra Clave de Seguridad</label>
+                            <input type="text" name="palabra_clave" class="form-control" placeholder="La que usaste al registrarte" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Nueva Contraseña</label>
+                            <input type="password" name="nueva_contrasena" class="form-control" required>
+                            <small class="text-muted">Debe tener 8 caracteres, números y símbolos.</small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Actualizar Contraseña</button>
+                            <a href="{{ url_for('login') }}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
