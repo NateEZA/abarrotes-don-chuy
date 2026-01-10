@@ -24,6 +24,12 @@
                 Mínimo 8 caracteres, al menos 1 número y 1 símbolo especial
             </small>
         </div>
+        <div class="mb-3">
+    <label class="form-label">Palabra Clave de Recuperación</label>
+    <input type="text" class="form-control" name="palabra_clave" placeholder="Ej. El nombre de mi gato" required>
+    <small class="text-muted">Necesitarás esto si olvidas tu contraseña.</small>
+</div>
+    
         
         <div class="grupo-formulario">
             <label for="rol">Tipo de Cuenta *</label>
@@ -36,11 +42,6 @@
         <button type="submit" class="btn btn-primario btn-bloque">Registrarse</button>
     </form>
     
-    <div class="mb-3">
-    <label class="form-label">Palabra Clave de Recuperación</label>
-    <input type="text" class="form-control" name="palabra_clave" placeholder="Ej. El nombre de mi gato" required>
-    <small class="text-muted">Necesitarás esto si olvidas tu contraseña.</small>
-</div>
     
     <p style="text-align: center; margin-top: 1.5rem; color: #7f8c8d;">
         ¿Ya tienes cuenta? <a href="{{ url_for('login') }}" style="color: #3498db; text-decoration: none;">Iniciar Sesión</a>
