@@ -15,16 +15,18 @@ def inicializar_db():
         nate = Usuario(
             nombre_usuario='Nate',
             email='nate@abarrotesdonchuy.com',
-            rol='Admin'
+            rol='Admin',
+            palabra_clave='mi primera mascota'
         )
-        nate.establecer_contrasena('Nate123!')  # Cumple con requisitos: 8 chars, número, símbolo
+        nate.establecer_contrasena('Nate123!')
         db.session.add(nate)
         
         # Crear un administrador regular
         admin = Usuario(
             nombre_usuario='admin',
             email='admin@abarrotesdonchuy.com',
-            rol='Admin'
+            rol='Admin',
+            palabra_clave='ciudad natal'
         )
         admin.establecer_contrasena('Admin123!')
         db.session.add(admin)
@@ -33,7 +35,8 @@ def inicializar_db():
         vendedor1 = Usuario(
             nombre_usuario='maria_gomez',
             email='maria@abarrotesdonchuy.com',
-            rol='Vendedor'
+            rol='Vendedor',
+            palabra_clave='color favorito'
         )
         vendedor1.establecer_contrasena('Vende123!')
         db.session.add(vendedor1)
@@ -41,7 +44,8 @@ def inicializar_db():
         vendedor2 = Usuario(
             nombre_usuario='juan_perez',
             email='juan@abarrotesdonchuy.com',
-            rol='Vendedor'
+            rol='Vendedor',
+            palabra_clave='comida favorita'
         )
         vendedor2.establecer_contrasena('Vende123!')
         db.session.add(vendedor2)
@@ -50,7 +54,8 @@ def inicializar_db():
         comprador1 = Usuario(
             nombre_usuario='carlos_lopez',
             email='carlos@cliente.com',
-            rol='Comprador'
+            rol='Comprador',
+            palabra_clave='nombre de madre'
         )
         comprador1.establecer_contrasena('Compra123!')
         db.session.add(comprador1)
@@ -58,7 +63,8 @@ def inicializar_db():
         comprador2 = Usuario(
             nombre_usuario='ana_martinez',
             email='ana@cliente.com',
-            rol='Comprador'
+            rol='Comprador',
+            palabra_clave='mejor amigo'
         )
         comprador2.establecer_contrasena('Compra123!')
         db.session.add(comprador2)
@@ -66,85 +72,101 @@ def inicializar_db():
         db.session.commit()
         print("\n✓ Usuarios creados exitosamente")
         
-        # Crear productos de prueba típicos de abarrotes
+        # Crear productos electrónicos
         productos = [
             {
-                'nombre': 'Aceite Vegetal 1L',
-                'descripcion': 'Aceite vegetal comestible 100% puro, ideal para cocinar y freír',
-                'precio': 45.50,
-                'stock': 50,
+                'nombre': 'iPhone 15 Pro Max 256GB',
+                'descripcion': 'Smartphone Apple con chip A17 Pro, cámara de 48MP, pantalla Super Retina XDR de 6.7 pulgadas, iOS 17',
+                'precio': 28999.00,
+                'stock': 15,
                 'id_vendedor': vendedor1.id,
                 'esta_aprobado': True
             },
             {
-                'nombre': 'Arroz Blanco 1kg',
-                'descripcion': 'Arroz blanco de grano largo, calidad premium',
-                'precio': 28.00,
-                'stock': 100,
+                'nombre': 'Samsung Galaxy S24 Ultra',
+                'descripcion': 'Smartphone Samsung con Snapdragon 8 Gen 3, 12GB RAM, 256GB almacenamiento, S Pen integrado',
+                'precio': 26999.00,
+                'stock': 20,
                 'id_vendedor': vendedor1.id,
                 'esta_aprobado': True
             },
             {
-                'nombre': 'Frijol Negro 1kg',
-                'descripcion': 'Frijol negro seleccionado, rico en proteínas',
-                'precio': 35.00,
-                'stock': 75,
+                'nombre': 'MacBook Pro 14" M3',
+                'descripcion': 'Laptop Apple con chip M3, 16GB RAM, SSD 512GB, pantalla Liquid Retina XDR, macOS Sonoma',
+                'precio': 45999.00,
+                'stock': 8,
                 'id_vendedor': vendedor2.id,
                 'esta_aprobado': True
             },
             {
-                'nombre': 'Azúcar Refinada 2kg',
-                'descripcion': 'Azúcar blanca refinada, endulzante natural',
-                'precio': 38.50,
-                'stock': 60,
+                'nombre': 'Dell XPS 15',
+                'descripcion': 'Laptop Dell con Intel Core i7 13va Gen, 16GB RAM, SSD 1TB, NVIDIA RTX 4050, pantalla 15.6" OLED',
+                'precio': 38999.00,
+                'stock': 12,
                 'id_vendedor': vendedor2.id,
                 'esta_aprobado': False  # Pendiente de aprobación
             },
             {
-                'nombre': 'Café Molido 500g',
-                'descripcion': 'Café 100% arabica, molido medio, sabor intenso',
-                'precio': 125.00,
+                'nombre': 'iPad Pro 12.9" M2',
+                'descripcion': 'Tablet Apple con chip M2, 256GB, pantalla Liquid Retina XDR, compatible con Apple Pencil',
+                'precio': 24999.00,
+                'stock': 10,
+                'id_vendedor': vendedor1.id,
+                'esta_aprobado': True
+            },
+            {
+                'nombre': 'AirPods Pro 2da Gen',
+                'descripcion': 'Audífonos inalámbricos Apple con cancelación activa de ruido, audio espacial, chip H2',
+                'precio': 5499.00,
                 'stock': 30,
-                'id_vendedor': vendedor1.id,
-                'esta_aprobado': True
-            },
-            {
-                'nombre': 'Pasta Espagueti 500g',
-                'descripcion': 'Pasta de trigo duro, cocción rápida',
-                'precio': 22.50,
-                'stock': 80,
                 'id_vendedor': vendedor2.id,
                 'esta_aprobado': True
             },
             {
-                'nombre': 'Harina de Trigo 1kg',
-                'descripcion': 'Harina refinada para todo uso, ideal para panificación',
-                'precio': 25.00,
-                'stock': 90,
+                'nombre': 'Sony WH-1000XM5',
+                'descripcion': 'Audífonos over-ear con cancelación de ruido premium, 30 horas de batería, audio Hi-Res',
+                'precio': 7999.00,
+                'stock': 25,
                 'id_vendedor': vendedor1.id,
                 'esta_aprobado': True
             },
             {
-                'nombre': 'Sal de Mesa 1kg',
-                'descripcion': 'Sal refinada yodada, indispensable en tu cocina',
-                'precio': 12.00,
-                'stock': 120,
+                'nombre': 'Samsung Galaxy Watch 6',
+                'descripcion': 'Smartwatch con pantalla Super AMOLED, GPS, monitoreo de salud 24/7, resistente al agua',
+                'precio': 6999.00,
+                'stock': 18,
                 'id_vendedor': vendedor2.id,
                 'esta_aprobado': True
             },
             {
-                'nombre': 'Atún en Lata 140g',
-                'descripcion': 'Atún en agua, alto contenido de proteína',
-                'precio': 18.50,
-                'stock': 150,
+                'nombre': 'Xiaomi 13T Pro 5G',
+                'descripcion': 'Smartphone con MediaTek Dimensity 9200+, 12GB RAM, cámara Leica de 50MP, carga rápida 120W',
+                'precio': 13999.00,
+                'stock': 22,
                 'id_vendedor': vendedor1.id,
                 'esta_aprobado': True
             },
             {
-                'nombre': 'Leche Entera 1L',
-                'descripcion': 'Leche entera pasteurizada, rica en calcio',
-                'precio': 22.00,
-                'stock': 40,
+                'nombre': 'Lenovo Legion 5 Pro',
+                'descripcion': 'Laptop gaming con AMD Ryzen 7, RTX 4060 8GB, 16GB RAM, SSD 1TB, pantalla 165Hz QHD',
+                'precio': 32999.00,
+                'stock': 6,
+                'id_vendedor': vendedor2.id,
+                'esta_aprobado': True
+            },
+            {
+                'nombre': 'Nintendo Switch OLED',
+                'descripcion': 'Consola híbrida con pantalla OLED de 7 pulgadas, 64GB almacenamiento, Joy-Con incluidos',
+                'precio': 8499.00,
+                'stock': 14,
+                'id_vendedor': vendedor1.id,
+                'esta_aprobado': True
+            },
+            {
+                'nombre': 'PlayStation 5',
+                'descripcion': 'Consola de videojuegos con SSD ultra rápido, ray tracing, 4K hasta 120fps, control DualSense',
+                'precio': 14999.00,
+                'stock': 5,
                 'id_vendedor': vendedor2.id,
                 'esta_aprobado': True
             }
@@ -155,15 +177,15 @@ def inicializar_db():
             db.session.add(producto)
         
         db.session.commit()
-        print("✓ Productos creados exitosamente")
+        print("✓ Productos electrónicos creados exitosamente")
         
         # Crear direcciones para compradores
         direccion1 = Direccion(
             id_usuario=comprador1.id,
-            calle='Av. Juárez 123, Col. Centro',
+            calle='Av. Insurgentes Sur 1234',
             ciudad='Ciudad de México',
             estado='CDMX',
-            codigo_postal='06000',
+            codigo_postal='03100',
             pais='México',
             es_predeterminada=True
         )
@@ -171,10 +193,10 @@ def inicializar_db():
         
         direccion2 = Direccion(
             id_usuario=comprador1.id,
-            calle='Calle Reforma 456, Col. Polanco',
+            calle='Calle Reforma 456, Col. Juárez',
             ciudad='Ciudad de México',
             estado='CDMX',
-            codigo_postal='11560',
+            codigo_postal='06600',
             pais='México',
             es_predeterminada=False
         )
@@ -182,10 +204,10 @@ def inicializar_db():
         
         direccion3 = Direccion(
             id_usuario=comprador2.id,
-            calle='Insurgentes Sur 789, Col. Del Valle',
-            ciudad='Ciudad de México',
-            estado='CDMX',
-            codigo_postal='03100',
+            calle='Av. Chapultepec 789',
+            ciudad='Guadalajara',
+            estado='Jalisco',
+            codigo_postal='44100',
             pais='México',
             es_predeterminada=True
         )
@@ -224,7 +246,7 @@ def inicializar_db():
         # Crear órdenes de ejemplo
         orden1 = Orden(
             id_comprador=comprador1.id,
-            total=193.50,
+            total=34498.00,
             estado='Completada',
             id_direccion_envio=direccion1.id,
             id_metodo_pago=pago1.id
@@ -235,24 +257,24 @@ def inicializar_db():
         # Items de la orden 1
         item1 = ItemOrden(
             id_orden=orden1.id,
-            id_producto=1,  # Aceite
-            cantidad=2,
-            precio=45.50
+            id_producto=1,  # iPhone 15 Pro Max
+            cantidad=1,
+            precio=28999.00
         )
         db.session.add(item1)
         
         item2 = ItemOrden(
             id_orden=orden1.id,
-            id_producto=3,  # Frijol
-            cantidad=3,
-            precio=35.00
+            id_producto=6,  # AirPods Pro
+            cantidad=1,
+            precio=5499.00
         )
         db.session.add(item2)
         
         # Orden 2
         orden2 = Orden(
             id_comprador=comprador2.id,
-            total=147.50,
+            total=45999.00,
             estado='Completada',
             id_direccion_envio=direccion3.id,
             id_metodo_pago=pago2.id
@@ -262,19 +284,11 @@ def inicializar_db():
         
         item3 = ItemOrden(
             id_orden=orden2.id,
-            id_producto=5,  # Café
+            id_producto=3,  # MacBook Pro
             cantidad=1,
-            precio=125.00
+            precio=45999.00
         )
         db.session.add(item3)
-        
-        item4 = ItemOrden(
-            id_orden=orden2.id,
-            id_producto=6,  # Pasta
-            cantidad=1,
-            precio=22.50
-        )
-        db.session.add(item4)
         
         db.session.commit()
         print("✓ Órdenes creadas exitosamente")
@@ -282,35 +296,27 @@ def inicializar_db():
         # Crear reseñas
         resena1 = Resena(
             id_usuario=comprador1.id,
-            id_producto=1,  # Aceite
+            id_producto=1,  # iPhone
             calificacion=5,
-            comentario='Excelente aceite, muy buena calidad y precio justo'
+            comentario='Excelente teléfono, la cámara es increíble y la batería dura todo el día'
         )
         db.session.add(resena1)
         
         resena2 = Resena(
             id_usuario=comprador1.id,
-            id_producto=3,  # Frijol
-            calificacion=4,
-            comentario='Buenos frijoles, aunque tardaron un poco más en cocinarse'
+            id_producto=6,  # AirPods
+            calificacion=5,
+            comentario='Mejor cancelación de ruido que he probado, perfectos para trabajar'
         )
         db.session.add(resena2)
         
         resena3 = Resena(
             id_usuario=comprador2.id,
-            id_producto=5,  # Café
+            id_producto=3,  # MacBook
             calificacion=5,
-            comentario='El mejor café que he probado, aroma increíble'
+            comentario='Potencia increíble, la pantalla es hermosa. Vale cada peso'
         )
         db.session.add(resena3)
-        
-        resena4 = Resena(
-            id_usuario=comprador2.id,
-            id_producto=6,  # Pasta
-            calificacion=4,
-            comentario='Buena pasta, se cocina rápido y tiene buen sabor'
-        )
-        db.session.add(resena4)
         
         db.session.commit()
         print("✓ Reseñas creadas exitosamente")
@@ -319,26 +325,33 @@ def inicializar_db():
         print("✓✓✓ DATOS DE PRUEBA CREADOS EXITOSAMENTE ✓✓✓")
         print("="*60)
         print("\n🏪 BIENVENIDO A ABARROTES DON CHUY 🏪")
+        print("Tienda de Electrónica y Tecnología")
         print("\nCREDENCIALES DE ACCESO:")
         print("-" * 60)
-        print("\n👑 Super Administrador (Puede crear otros admins):")
+        print("\n👑 Super Administrador:")
         print("  Usuario: Nate")
         print("  Contraseña: Nate123!")
+        print("  Palabra clave: mi primera mascota")
         print("\n🔧 Administrador Regular:")
         print("  Usuario: admin")
         print("  Contraseña: Admin123!")
+        print("  Palabra clave: ciudad natal")
         print("\n🏪 Vendedor 1:")
         print("  Usuario: maria_gomez")
         print("  Contraseña: Vende123!")
+        print("  Palabra clave: color favorito")
         print("\n🏪 Vendedor 2:")
         print("  Usuario: juan_perez")
         print("  Contraseña: Vende123!")
+        print("  Palabra clave: comida favorita")
         print("\n🛒 Comprador 1:")
         print("  Usuario: carlos_lopez")
         print("  Contraseña: Compra123!")
+        print("  Palabra clave: nombre de madre")
         print("\n🛒 Comprador 2:")
         print("  Usuario: ana_martinez")
         print("  Contraseña: Compra123!")
+        print("  Palabra clave: mejor amigo")
         print("\n" + "="*60)
         print("📦 Base de datos: abarrotes_don_chuy.db")
         print("🌐 Ejecuta: python app.py")

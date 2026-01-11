@@ -92,9 +92,8 @@ def registro():
         nombre_usuario = request.form.get('nombre_usuario')
         email = request.form.get('email')
         contrasena = request.form.get('contrasena')
-        rol = request.form.get('rol', 'Comprador')
-        # NUEVO: Obtener palabra clave
         palabra_clave = request.form.get('palabra_clave')
+        rol = request.form.get('rol', 'Comprador')
         
         # Validar que el usuario no exista
         if Usuario.query.filter_by(nombre_usuario=nombre_usuario).first():
@@ -111,12 +110,17 @@ def registro():
             flash(mensaje, 'danger')
             return redirect(url_for('registro'))
         
-        # Crear usuario (con palabra clave)
+        # Validar palabra clave
+        if not palabra_clave or len(palabra_clave.strip()) < 3:
+            flash('La palabra clave debe tener al menos 3 caracteres', 'danger')
+            return redirect(url_for('registro'))
+        
+        # Crear usuario
         usuario = Usuario(
             nombre_usuario=nombre_usuario, 
             email=email, 
             rol=rol,
-            palabra_clave=palabra_clave # <-- GUARDAR CAMPO
+            palabra_clave=palabra_clave.strip().lower()
         )
         usuario.establecer_contrasena(contrasena)
         
@@ -153,39 +157,57 @@ def login():
     
     return render_template('login.html')
 
-# --- NUEVA RUTA: RECUPERAR CONTRASEÑA ---
-@app.route('/recuperar', methods=['GET', 'POST'])
-def recuperar_password():
+@app.route('/recuperar-contrasena', methods=['GET', 'POST'])
+def recuperar_contrasena():
     if request.method == 'POST':
-        email = request.form.get('email')
-        palabra_clave_ingresada = request.form.get('palabra_clave')
-        nueva_contrasena = request.form.get('nueva_contrasena')
+        paso = request.form.get('paso', '1')
         
-        usuario = Usuario.query.filter_by(email=email).first()
-        
-        if not usuario:
-            flash('El correo no está registrado.', 'danger')
-            return redirect(url_for('recuperar_password'))
+        if paso == '1':
+            # Paso 1: Verificar usuario y palabra clave
+            nombre_usuario = request.form.get('nombre_usuario')
+            palabra_clave = request.form.get('palabra_clave')
             
-        # Verificar palabra clave (Coincidencia exacta)
-        if usuario.palabra_clave != palabra_clave_ingresada:
-            flash('La palabra clave es incorrecta.', 'danger')
-            return redirect(url_for('recuperar_password'))
+            usuario = Usuario.query.filter_by(nombre_usuario=nombre_usuario).first()
             
-        # Validar la nueva contraseña
-        valido, mensaje = validar_contrasena(nueva_contrasena)
-        if not valido:
-            flash(mensaje, 'danger')
-            return redirect(url_for('recuperar_password'))
+            if usuario and usuario.palabra_clave == palabra_clave.strip().lower():
+                # Guardar el ID del usuario en sesión temporal para el paso 2
+                session['recuperacion_usuario_id'] = usuario.id
+                return render_template('recuperar_contrasena.html', paso=2, nombre_usuario=nombre_usuario)
+            else:
+                flash('Usuario o palabra clave incorrectos', 'danger')
+                return render_template('recuperar_contrasena.html', paso=1)
+        
+        elif paso == '2':
+            # Paso 2: Establecer nueva contraseña
+            if 'recuperacion_usuario_id' not in session:
+                flash('Sesión expirada. Intenta de nuevo', 'warning')
+                return redirect(url_for('recuperar_contrasena'))
             
-        # Actualizar contraseña
-        usuario.establecer_contrasena(nueva_contrasena)
-        db.session.commit()
-        
-        flash('¡Contraseña actualizada correctamente! Inicia sesión.', 'success')
-        return redirect(url_for('login'))
-        
-    return render_template('recuperar.html')
+            nueva_contrasena = request.form.get('nueva_contrasena')
+            confirmar_contrasena = request.form.get('confirmar_contrasena')
+            
+            if nueva_contrasena != confirmar_contrasena:
+                flash('Las contraseñas no coinciden', 'danger')
+                nombre_usuario = request.form.get('nombre_usuario')
+                return render_template('recuperar_contrasena.html', paso=2, nombre_usuario=nombre_usuario)
+            
+            valido, mensaje = validar_contrasena(nueva_contrasena)
+            if not valido:
+                flash(mensaje, 'danger')
+                nombre_usuario = request.form.get('nombre_usuario')
+                return render_template('recuperar_contrasena.html', paso=2, nombre_usuario=nombre_usuario)
+            
+            usuario = Usuario.query.get(session['recuperacion_usuario_id'])
+            usuario.establecer_contrasena(nueva_contrasena)
+            db.session.commit()
+            
+            # Limpiar sesión de recuperación
+            session.pop('recuperacion_usuario_id', None)
+            
+            flash('¡Contraseña restablecida exitosamente! Ahora puedes iniciar sesión', 'success')
+            return redirect(url_for('login'))
+    
+    return render_template('recuperar_contrasena.html', paso=1)
 
 @app.route('/cerrar-sesion')
 def cerrar_sesion():
@@ -256,12 +278,12 @@ def panel_admin():
     ordenes_recientes = Orden.query.order_by(Orden.fecha_creacion.desc()).limit(10).all()
     
     return render_template('panel_admin.html', 
-                          total_usuarios=total_usuarios,
-                          total_productos=total_productos,
-                          total_ordenes=total_ordenes,
-                          ingresos_totales=ingresos_totales,
-                          productos_pendientes=productos_pendientes,
-                          ordenes_recientes=ordenes_recientes)
+                         total_usuarios=total_usuarios,
+                         total_productos=total_productos,
+                         total_ordenes=total_ordenes,
+                         ingresos_totales=ingresos_totales,
+                         productos_pendientes=productos_pendientes,
+                         ordenes_recientes=ordenes_recientes)
 
 @app.route('/admin/usuarios')
 @rol_requerido(['Admin'])
@@ -281,6 +303,7 @@ def crear_admin():
         nombre_usuario = request.form.get('nombre_usuario')
         email = request.form.get('email')
         contrasena = request.form.get('contrasena')
+        palabra_clave = request.form.get('palabra_clave')
         
         if Usuario.query.filter_by(nombre_usuario=nombre_usuario).first():
             flash('El usuario ya existe', 'danger')
@@ -291,7 +314,16 @@ def crear_admin():
             flash(mensaje, 'danger')
             return redirect(url_for('crear_admin'))
         
-        usuario = Usuario(nombre_usuario=nombre_usuario, email=email, rol='Admin')
+        if not palabra_clave or len(palabra_clave.strip()) < 3:
+            flash('La palabra clave debe tener al menos 3 caracteres', 'danger')
+            return redirect(url_for('crear_admin'))
+        
+        usuario = Usuario(
+            nombre_usuario=nombre_usuario, 
+            email=email, 
+            rol='Admin',
+            palabra_clave=palabra_clave.strip().lower()
+        )
         usuario.establecer_contrasena(contrasena)
         db.session.add(usuario)
         db.session.commit()
@@ -342,9 +374,9 @@ def panel_vendedor():
             ingresos_totales += item.precio * item.cantidad
     
     return render_template('panel_vendedor.html', 
-                          productos=productos,
-                          total_ventas=total_ventas,
-                          ingresos_totales=ingresos_totales)
+                         productos=productos,
+                         total_ventas=total_ventas,
+                         ingresos_totales=ingresos_totales)
 
 @app.route('/vendedor/agregar-producto', methods=['GET', 'POST'])
 @rol_requerido(['Vendedor'])

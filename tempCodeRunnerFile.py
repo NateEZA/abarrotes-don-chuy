@@ -24,11 +24,13 @@ def archivo_permitido(nombre_archivo):
 
 def validar_contrasena(contrasena):
     if len(contrasena) < 8:
-        return False, "La contraseña debe tener al menos 8 caracteres"
-    if not re.search(r'\d', contrasena):
-        return False, "La contraseña debe contener al menos un número"
-    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', contrasena):
-        return False, "La contraseña debe contener al menos un símbolo especial"
+        return False, "La contraseña debe tener al menos 8 caracteres."
+    if not re.search(r"[A-Z]", contrasena):
+        return False, "La contraseña debe incluir al menos una letra MAYÚSCULA."
+    if not re.search(r"\d", contrasena):
+        return False, "La contraseña debe incluir al menos un número."
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", contrasena):
+        return False, "La contraseña debe incluir al menos un carácter especial (ej. ! @ # $)."
     return True, ""
 
 def validar_vencimiento_tarjeta(mes, anio):

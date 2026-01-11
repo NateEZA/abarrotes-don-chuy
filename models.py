@@ -5,25 +5,35 @@ from datetime import datetime
 db = SQLAlchemy()
 
 class Usuario(db.Model):
-    __tablename__ = 'usuarios'  # Forzamos el nombre plural para evitar confusiones
+    __tablename__ = 'usuarios'
+    
     id = db.Column(db.Integer, primary_key=True)
     nombre_usuario = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128))
-    rol = db.Column(db.String(20), default='Comprador')
-    
-    # NUEVA COLUMNA
-    palabra_clave = db.Column(db.String(100), nullable=False, default='sin_clave')
-    
-    # Datos extra opcionales
-    foto_perfil = db.Column(db.String(120), default='default.jpg')
+    hash_contrasena = db.Column(db.String(255), nullable=False)
+    palabra_clave = db.Column(db.String(100), nullable=False)  # Para recuperación de contraseña
+    rol = db.Column(db.String(20), nullable=False)  # Admin, Vendedor, Comprador
+    foto_perfil = db.Column(db.String(255), default='default.jpg')
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relaciones
+    productos = db.relationship('Producto', backref='vendedor', lazy=True, cascade='all, delete-orphan')
+    ordenes = db.relationship('Orden', backref='comprador', lazy=True, cascade='all, delete-orphan')
+    direcciones = db.relationship('Direccion', backref='usuario', lazy=True, cascade='all, delete-orphan')
+    metodos_pago = db.relationship('MetodoPago', backref='usuario', lazy=True, cascade='all, delete-orphan')
+    resenas = db.relationship('Resena', backref='usuario', lazy=True, cascade='all, delete-orphan')
+    
+    def establecer_contrasena(self, contrasena):
+        """Establece la contraseña del usuario con hash"""
+        self.hash_contrasena = generate_password_hash(contrasena)
+    
+    def verificar_contrasena(self, contrasena):
+        """Verifica si la contraseña es correcta"""
+        return check_password_hash(self.hash_contrasena, contrasena)
+    
+    def __repr__(self):
+        return f'<Usuario {self.nombre_usuario}>'
 
-    def establecer_contrasena(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def verificar_contrasena(self, password):
-        return check_password_hash(self.password_hash, password)
 
 class Producto(db.Model):
     __tablename__ = 'productos'
@@ -128,4 +138,3 @@ class Resena(db.Model):
     
     def __repr__(self):
         return f'<Resena {self.id} - {self.calificacion} estrellas>'
-    

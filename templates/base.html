@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block titulo %}Abarrotes Don Chuy{% endblock %}</title>
+    <title>{% block titulo %}Abarrotes Don Chuy - Tienda de Electrónica{% endblock %}</title>
     <style>
         * {
             margin: 0;
@@ -39,6 +39,15 @@
             font-size: 1.8rem;
             font-weight: bold;
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logo-subtitle {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            font-weight: normal;
         }
         
         .enlaces-nav {
@@ -118,8 +127,6 @@
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             transition: transform 0.3s, box-shadow 0.3s;
-            display: flex; /* Asegura que el contenido se estire */
-            flex-direction: column;
         }
         
         .tarjeta-producto:hover {
@@ -136,9 +143,6 @@
         
         .info-producto {
             padding: 1.5rem;
-            flex-grow: 1; /* Empuja el botón hacia abajo */
-            display: flex;
-            flex-direction: column;
         }
         
         .nombre-producto {
@@ -239,7 +243,6 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-collapse: collapse; /* Importante para bordes limpios */
         }
         
         .tabla th {
@@ -272,20 +275,20 @@
             margin-top: auto;
         }
         
-        /* Badge para roles (Agregado para corregir el error de VS Code anterior) */
-        .rol-badge {
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
+        /* Utilidades */
+        .texto-centro {
+            text-align: center;
         }
         
-        /* Utilidades */
-        .texto-centro { text-align: center; }
         .mt-1 { margin-top: 0.5rem; }
         .mt-2 { margin-top: 1rem; }
         .mt-3 { margin-top: 1.5rem; }
         .mt-4 { margin-top: 2rem; }
+        
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 2rem; }
         
         /* Responsive */
         @media (max-width: 768px) {
@@ -304,53 +307,17 @@
                 grid-template-columns: 1fr;
             }
         }
-        /* Badges para el estado de la orden */
-.estado-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.estado-completada {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.estado-pendiente {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
-}
-
-.estado-cancelada {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-/* Estilos para las estrellas de calificación */
-.estrella {
-    font-size: 1rem; /* Tamaño normal en el índice */
-}
-
-.estrella-grande {
-    font-size: 1.5rem; /* Tamaño grande en detalle del producto */
-}
-
-.estrella-llena {
-    color: #f39c12; /* Color dorado/naranja */
-}
-
-.estrella-vacia {
-    color: #e0e0e0; /* Color gris */
-}
     </style>
 </head>
 <body>
     <nav>
         <div class="contenedor-nav">
-            <a href="{{ url_for('index') }}" class="logo">🏪 Abarrotes Don Chuy</a>
+            <div>
+                <a href="{{ url_for('index') }}" class="logo">
+                    <span>📱 Abarrotes Don Chuy</span>
+                </a>
+                <div class="logo-subtitle" style="color: white; margin-left: 2.5rem;">Tienda de Electrónica y Tecnología</div>
+            </div>
             <ul class="enlaces-nav">
                 <li><a href="{{ url_for('index') }}">Inicio</a></li>
                 {% if session.id_usuario %}
@@ -393,8 +360,8 @@
     </div>
     
     <footer>
-        <p>&copy; 2024 Abarrotes Don Chuy. Todos los derechos reservados.</p>
-        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Tu tienda de confianza en la colonia</p>
+        <p>&copy; 2024 Abarrotes Don Chuy - Tienda de Electrónica. Todos los derechos reservados.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">📱 Celulares | 💻 Laptops | 🎮 Consolas | 🎧 Audio | ⌚ Smartwatches</p>
     </footer>
 </body>
 </html>
