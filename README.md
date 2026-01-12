@@ -127,7 +127,7 @@ Este proyecto está bajo la Licencia MIT.
 
 ## 👨‍💻 Autor
 
-[Nathan] - [Tu GitHub](https://github.com/NateEZA)
+[Nathan y Efrain] - [Tu GitHub](https://github.com/NateEZA)
 
 ---
 
