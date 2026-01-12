@@ -1,53 +1,85 @@
 {% extends "base.html" %}
+
 {% block titulo %}Agregar Tarjeta - Abarrotes Don Chuy{% endblock %}
+
 {% block contenido %}
 <div style="max-width: 700px; margin: 0 auto;">
     <h1 style="color: #2c3e50; margin-bottom: 2rem;">💳 Agregar Tarjeta</h1>
+    
     <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
         <form method="POST">
             <div class="grupo-formulario">
-                <label for="numero_tarjeta">Número de Tarjeta *</label>
-                <input type="text" id="numero_tarjeta" name="numero_tarjeta" class="control-formulario" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                <label for="tipo_tarjeta">Tipo de Tarjeta *</label>
+                <select id="tipo_tarjeta" name="tipo_tarjeta" class="control-formulario" required>
+                    <option value="credito">Tarjeta de Crédito</option>
+                    <option value="debito">Tarjeta de Débito</option>
+                </select>
             </div>
+            
             <div class="grupo-formulario">
-                <label for="titular_tarjeta">Titular *</label>
-                <input type="text" id="titular_tarjeta" name="titular_tarjeta" class="control-formulario" placeholder="NOMBRE APELLIDO" required style="text-transform: uppercase;">
+                <label for="numero_tarjeta">Número de Tarjeta *</label>
+                <input type="text" id="numero_tarjeta" name="numero_tarjeta" class="control-formulario" 
+                       placeholder="1234 5678 9012 3456" maxlength="19" required>
             </div>
+            
+            <div class="grupo-formulario">
+                <label for="titular_tarjeta">Titular de la Tarjeta *</label>
+                <input type="text" id="titular_tarjeta" name="titular_tarjeta" class="control-formulario" 
+                       placeholder="NOMBRE APELLIDO" required style="text-transform: uppercase;">
+            </div>
+            
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
                 <div class="grupo-formulario">
                     <label for="mes_vencimiento">Mes (MM) *</label>
-                    <input type="text" id="mes_vencimiento" name="mes_vencimiento" class="control-formulario" placeholder="01-12" maxlength="2" pattern="0[1-9]|1[0-2]" required>
+                    <input type="text" id="mes_vencimiento" name="mes_vencimiento" class="control-formulario" 
+                           placeholder="01-12" maxlength="2" pattern="0[1-9]|1[0-2]" required>
                 </div>
+                
                 <div class="grupo-formulario">
                     <label for="anio_vencimiento">Año (YY) *</label>
-                    <input type="text" id="anio_vencimiento" name="anio_vencimiento" class="control-formulario" placeholder="25" maxlength="2" pattern="[0-9]{2}" required>
+                    <input type="text" id="anio_vencimiento" name="anio_vencimiento" class="control-formulario" 
+                           placeholder="25" maxlength="2" pattern="[0-9]{2}" required>
                 </div>
+                
                 <div class="grupo-formulario">
                     <label for="cvv">CVV *</label>
-                    <input type="text" id="cvv" name="cvv" class="control-formulario" placeholder="123" maxlength="3" pattern="[0-9]{3}" required>
+                    <input type="text" id="cvv" name="cvv" class="control-formulario" 
+                           placeholder="123" maxlength="3" pattern="[0-9]{3}" required>
                 </div>
             </div>
+            
             <div class="grupo-formulario">
-                <label><input type="checkbox" name="es_predeterminado" style="margin-right: 0.5rem;">Establecer como predeterminado</label>
+                <label>
+                    <input type="checkbox" name="es_predeterminado" style="margin-right: 0.5rem;">
+                    Establecer como método de pago predeterminado
+                </label>
             </div>
+            
             <div style="background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                <strong>🔒 Seguridad:</strong> Solo guardamos los últimos 4 dígitos.
+                <strong>🔒 Seguridad:</strong> Tu información está protegida. Solo guardamos los últimos 4 dígitos.
             </div>
+            
             <div style="background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                <strong>⚠️ Validaciones:</strong><br>• Mes entre 01-12<br>• Tarjeta no expirada<br>• CVV de 3 dígitos
+                <strong>⚠️ Validaciones:</strong><br>
+                • El mes debe ser entre 01 y 12<br>
+                • La tarjeta no debe estar expirada<br>
+                • El CVV debe tener exactamente 3 dígitos
             </div>
+            
             <div style="display: flex; gap: 1rem;">
-                <button type="submit" class="btn btn-primario" style="flex: 1;">Guardar</button>
+                <button type="submit" class="btn btn-primario" style="flex: 1;">Guardar Tarjeta</button>
                 <a href="{{ url_for('perfil') }}" class="btn btn-secundario">Cancelar</a>
             </div>
         </form>
     </div>
 </div>
+
 <script>
+// Formatear número de tarjeta automáticamente
 document.getElementById('numero_tarjeta').addEventListener('input', function(e) {
-    let valor = e.target.value.replace(/\s/g, '');
-    let valorFormateado = valor.match(/.{1,4}/g)?.join(' ') || valor;
-    e.target.value = valorFormateado;
+    let value = e.target.value.replace(/\s/g, '');
+    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+    e.target.value = formattedValue;
 });
 </script>
 {% endblock %}

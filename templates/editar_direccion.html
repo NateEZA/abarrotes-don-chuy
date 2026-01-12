@@ -1,0 +1,88 @@
+<!-- ========== templates/editar_direccion.html ========== -->
+{% extends "base.html" %}
+{% block titulo %}Editar Dirección - Abarrotes Don Chuy{% endblock %}
+{% block contenido %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <h1 style="color: #2c3e50; margin-bottom: 2rem;">✏️ Editar Dirección</h1>
+    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <form method="POST">
+            <div class="grupo-formulario">
+                <label for="calle">Calle y Número *</label>
+                <input type="text" id="calle" name="calle" class="control-formulario" value="{{ direccion.calle }}" required>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="grupo-formulario">
+                    <label for="ciudad">Ciudad *</label>
+                    <input type="text" id="ciudad" name="ciudad" class="control-formulario" value="{{ direccion.ciudad }}" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label for="estado">Estado *</label>
+                    <input type="text" id="estado" name="estado" class="control-formulario" value="{{ direccion.estado }}" required>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="grupo-formulario">
+                    <label for="codigo_postal">Código Postal *</label>
+                    <input type="text" id="codigo_postal" name="codigo_postal" class="control-formulario" value="{{ direccion.codigo_postal }}" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label for="pais">País *</label>
+                    <input type="text" id="pais" name="pais" class="control-formulario" value="{{ direccion.pais }}" required>
+                </div>
+            </div>
+            <div class="grupo-formulario">
+                <label><input type="checkbox" name="es_predeterminada" {% if direccion.es_predeterminada %}checked{% endif %} style="margin-right: 0.5rem;">Establecer como predeterminada</label>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primario" style="flex: 1;">Guardar Cambios</button>
+                <a href="{{ url_for('perfil') }}" class="btn btn-secundario">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+<!-- ========== templates/editar_metodo_pago.html ========== -->
+{% extends "base.html" %}
+{% block titulo %}Editar Método de Pago - Abarrotes Don Chuy{% endblock %}
+{% block contenido %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <h1 style="color: #2c3e50; margin-bottom: 2rem;">✏️ Editar Método de Pago</h1>
+    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <form method="POST">
+            <div class="grupo-formulario">
+                <label>Últimos 4 dígitos (no editable)</label>
+                <input type="text" class="control-formulario" value="**** **** **** {{ metodo_pago.ultimos4_tarjeta }}" disabled>
+            </div>
+            <div class="grupo-formulario">
+                <label for="tipo_tarjeta">Tipo de Tarjeta *</label>
+                <select id="tipo_tarjeta" name="tipo_tarjeta" class="control-formulario" required>
+                    <option value="credito" {% if metodo_pago.tipo_tarjeta == 'credito' %}selected{% endif %}>Crédito</option>
+                    <option value="debito" {% if metodo_pago.tipo_tarjeta == 'debito' %}selected{% endif %}>Débito</option>
+                </select>
+            </div>
+            <div class="grupo-formulario">
+                <label for="titular_tarjeta">Titular *</label>
+                <input type="text" id="titular_tarjeta" name="titular_tarjeta" class="control-formulario" value="{{ metodo_pago.titular_tarjeta }}" required style="text-transform: uppercase;">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="grupo-formulario">
+                    <label for="mes_vencimiento">Mes (MM) *</label>
+                    <input type="text" id="mes_vencimiento" name="mes_vencimiento" class="control-formulario" value="{{ '%02d'|format(metodo_pago.mes_vencimiento) }}" maxlength="2" pattern="0[1-9]|1[0-2]" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label for="anio_vencimiento">Año (YY) *</label>
+                    <input type="text" id="anio_vencimiento" name="anio_vencimiento" class="control-formulario" value="{{ '%02d'|format(metodo_pago.anio_vencimiento) }}" maxlength="2" pattern="[0-9]{2}" required>
+                </div>
+            </div>
+            <div class="grupo-formulario">
+                <label><input type="checkbox" name="es_predeterminado" {% if metodo_pago.es_predeterminado %}checked{% endif %} style="margin-right: 0.5rem;">Establecer como predeterminado</label>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primario" style="flex: 1;">Guardar Cambios</button>
+                <a href="{{ url_for('perfil') }}" class="btn btn-secundario">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

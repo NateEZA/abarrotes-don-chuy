@@ -11,7 +11,7 @@ app.config['SECRET_KEY'] = 'abarrotes_don_chuy_clave_secreta_2024'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///abarrotes_don_chuy.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB máximo
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 EXTENSIONES_PERMITIDAS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -84,7 +84,8 @@ def rol_requerido(roles):
 @app.route('/')
 def index():
     productos = Producto.query.filter_by(esta_aprobado=True).all()
-    return render_template('index.html', productos=productos)
+    total_productos = len(productos)
+    return render_template('index.html', productos=productos, total_productos=total_productos)
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
@@ -95,7 +96,6 @@ def registro():
         palabra_clave = request.form.get('palabra_clave')
         rol = request.form.get('rol', 'Comprador')
         
-        # Validar que el usuario no exista
         if Usuario.query.filter_by(nombre_usuario=nombre_usuario).first():
             flash('El nombre de usuario ya existe', 'danger')
             return redirect(url_for('registro'))
@@ -104,18 +104,15 @@ def registro():
             flash('El correo electrónico ya está registrado', 'danger')
             return redirect(url_for('registro'))
         
-        # Validar contraseña
         valido, mensaje = validar_contrasena(contrasena)
         if not valido:
             flash(mensaje, 'danger')
             return redirect(url_for('registro'))
         
-        # Validar palabra clave
         if not palabra_clave or len(palabra_clave.strip()) < 3:
             flash('La palabra clave debe tener al menos 3 caracteres', 'danger')
             return redirect(url_for('registro'))
         
-        # Crear usuario
         usuario = Usuario(
             nombre_usuario=nombre_usuario, 
             email=email, 
@@ -163,14 +160,12 @@ def recuperar_contrasena():
         paso = request.form.get('paso', '1')
         
         if paso == '1':
-            # Paso 1: Verificar usuario y palabra clave
             nombre_usuario = request.form.get('nombre_usuario')
             palabra_clave = request.form.get('palabra_clave')
             
             usuario = Usuario.query.filter_by(nombre_usuario=nombre_usuario).first()
             
             if usuario and usuario.palabra_clave == palabra_clave.strip().lower():
-                # Guardar el ID del usuario en sesión temporal para el paso 2
                 session['recuperacion_usuario_id'] = usuario.id
                 return render_template('recuperar_contrasena.html', paso=2, nombre_usuario=nombre_usuario)
             else:
@@ -178,7 +173,6 @@ def recuperar_contrasena():
                 return render_template('recuperar_contrasena.html', paso=1)
         
         elif paso == '2':
-            # Paso 2: Establecer nueva contraseña
             if 'recuperacion_usuario_id' not in session:
                 flash('Sesión expirada. Intenta de nuevo', 'warning')
                 return redirect(url_for('recuperar_contrasena'))
@@ -201,7 +195,6 @@ def recuperar_contrasena():
             usuario.establecer_contrasena(nueva_contrasena)
             db.session.commit()
             
-            # Limpiar sesión de recuperación
             session.pop('recuperacion_usuario_id', None)
             
             flash('¡Contraseña restablecida exitosamente! Ahora puedes iniciar sesión', 'success')
@@ -222,7 +215,6 @@ def detalle_producto(id_producto):
     producto = Producto.query.get_or_404(id_producto)
     resenas = Resena.query.filter_by(id_producto=id_producto).all()
     
-    # Verificar si el usuario ya compró este producto
     puede_resenar = False
     if 'id_usuario' in session:
         ordenes_usuario = Orden.query.filter_by(id_comprador=session['id_usuario']).all()
@@ -239,7 +231,6 @@ def agregar_resena(id_producto):
     calificacion = int(request.form.get('calificacion'))
     comentario = request.form.get('comentario')
     
-    # Verificar que el usuario compró el producto
     ordenes_usuario = Orden.query.filter_by(id_comprador=session['id_usuario']).all()
     ha_comprado = False
     for orden in ordenes_usuario:
@@ -251,13 +242,19 @@ def agregar_resena(id_producto):
         flash('Solo puedes calificar productos que hayas comprado', 'danger')
         return redirect(url_for('detalle_producto', id_producto=id_producto))
     
-    # Verificar que no haya calificado antes
     resena_existente = Resena.query.filter_by(id_usuario=session['id_usuario'], id_producto=id_producto).first()
     if resena_existente:
         flash('Ya has calificado este producto', 'warning')
         return redirect(url_for('detalle_producto', id_producto=id_producto))
     
-    resena = Resena(id_usuario=session['id_usuario'], id_producto=id_producto, calificacion=calificacion, comentario=comentario)
+    usuario = Usuario.query.get(session['id_usuario'])
+    resena = Resena(
+        id_usuario=session['id_usuario'], 
+        nombre_usuario=usuario.nombre_usuario,
+        id_producto=id_producto, 
+        calificacion=calificacion, 
+        comentario=comentario
+    )
     db.session.add(resena)
     db.session.commit()
     
@@ -289,12 +286,12 @@ def panel_admin():
 @rol_requerido(['Admin'])
 def admin_usuarios():
     usuarios = Usuario.query.all()
-    return render_template('admin_usuarios.html', usuarios=usuarios)
+    es_super_admin = session.get('nombre_usuario') == 'Nate'
+    return render_template('admin_usuarios.html', usuarios=usuarios, es_super_admin=es_super_admin)
 
 @app.route('/admin/crear-admin', methods=['GET', 'POST'])
 @login_requerido
 def crear_admin():
-    # Solo "Nate" puede crear administradores
     if session.get('nombre_usuario') != 'Nate':
         flash('Solo Nate puede crear administradores', 'danger')
         return redirect(url_for('panel_admin'))
@@ -338,14 +335,23 @@ def crear_admin():
 def eliminar_usuario(id_usuario):
     usuario = Usuario.query.get_or_404(id_usuario)
     
-    # No permitir eliminar a Nate
     if usuario.nombre_usuario == 'Nate':
         flash('No se puede eliminar al super administrador Nate', 'danger')
         return redirect(url_for('admin_usuarios'))
     
+    # Actualizar referencias antes de eliminar
+    # Productos del vendedor - mantener con nombre
+    Producto.query.filter_by(id_vendedor=id_usuario).update({'id_vendedor': None})
+    
+    # Órdenes del comprador - mantener con nombre
+    Orden.query.filter_by(id_comprador=id_usuario).update({'id_comprador': None})
+    
+    # Reseñas del usuario - mantener con nombre
+    Resena.query.filter_by(id_usuario=id_usuario).update({'id_usuario': None})
+    
     db.session.delete(usuario)
     db.session.commit()
-    flash(f'Usuario {usuario.nombre_usuario} eliminado', 'success')
+    flash(f'Usuario {usuario.nombre_usuario} eliminado. Historial de ventas y reseñas preservado', 'success')
     return redirect(url_for('admin_usuarios'))
 
 @app.route('/admin/aprobar-producto/<int:id_producto>', methods=['POST'])
@@ -364,7 +370,6 @@ def aprobar_producto(id_producto):
 def panel_vendedor():
     productos = Producto.query.filter_by(id_vendedor=session['id_usuario']).all()
     
-    # Calcular ventas del vendedor
     total_ventas = 0
     ingresos_totales = 0
     for producto in productos:
@@ -391,7 +396,6 @@ def agregar_producto():
             flash('El precio debe ser mayor a 0', 'danger')
             return redirect(url_for('agregar_producto'))
         
-        # Manejar imagen
         nombre_imagen = 'producto_default.jpg'
         if 'imagen' in request.files:
             archivo = request.files['imagen']
@@ -401,6 +405,7 @@ def agregar_producto():
                 archivo.save(ruta_archivo)
                 nombre_imagen = nombre_archivo
         
+        usuario = Usuario.query.get(session['id_usuario'])
         producto = Producto(
             nombre=nombre,
             descripcion=descripcion,
@@ -408,6 +413,7 @@ def agregar_producto():
             stock=stock,
             imagen=nombre_imagen,
             id_vendedor=session['id_usuario'],
+            nombre_vendedor=usuario.nombre_usuario,
             esta_aprobado=False
         )
         
@@ -461,6 +467,9 @@ def eliminar_producto(id_producto):
         flash('No puedes eliminar productos de otros vendedores', 'danger')
         return redirect(url_for('panel_vendedor'))
     
+    # Actualizar items de orden para mantener historial
+    ItemOrden.query.filter_by(id_producto=id_producto).update({'id_producto': None})
+    
     db.session.delete(producto)
     db.session.commit()
     flash('Producto eliminado exitosamente', 'success')
@@ -499,6 +508,31 @@ def agregar_al_carrito(id_producto):
     flash('Producto agregado al carrito', 'success')
     return redirect(url_for('carrito'))
 
+@app.route('/actualizar-carrito/<int:id_producto>', methods=['POST'])
+@login_requerido
+def actualizar_carrito(id_producto):
+    nueva_cantidad = int(request.form.get('cantidad', 1))
+    producto = Producto.query.get(id_producto)
+    
+    if not producto:
+        flash('Producto no encontrado', 'danger')
+        return redirect(url_for('carrito'))
+    
+    if nueva_cantidad > producto.stock:
+        flash(f'Solo hay {producto.stock} unidades disponibles', 'warning')
+        nueva_cantidad = producto.stock
+    
+    if nueva_cantidad <= 0:
+        flash('La cantidad debe ser al menos 1', 'warning')
+        return redirect(url_for('carrito'))
+    
+    carrito = session.get('carrito', {})
+    carrito[str(id_producto)] = nueva_cantidad
+    session['carrito'] = carrito
+    
+    flash('Cantidad actualizada', 'success')
+    return redirect(url_for('carrito'))
+
 @app.route('/eliminar-del-carrito/<int:id_producto>', methods=['POST'])
 @login_requerido
 def eliminar_del_carrito(id_producto):
@@ -534,6 +568,7 @@ def checkout():
                 total += producto.precio * cantidad
                 items_orden.append({
                     'id_producto': producto.id,
+                    'nombre_producto': producto.nombre,
                     'cantidad': cantidad,
                     'precio': producto.precio
                 })
@@ -542,8 +577,10 @@ def checkout():
                 flash(f'Stock insuficiente para {producto.nombre}', 'danger')
                 return redirect(url_for('carrito'))
         
+        usuario = Usuario.query.get(session['id_usuario'])
         orden = Orden(
             id_comprador=session['id_usuario'],
+            nombre_comprador=usuario.nombre_usuario,
             total=total,
             id_direccion_envio=id_direccion,
             id_metodo_pago=id_pago,
@@ -557,6 +594,7 @@ def checkout():
             item_orden = ItemOrden(
                 id_orden=orden.id,
                 id_producto=item['id_producto'],
+                nombre_producto=item['nombre_producto'],
                 cantidad=item['cantidad'],
                 precio=item['precio']
             )
@@ -598,22 +636,58 @@ def agregar_direccion():
     
     return render_template('agregar_direccion.html')
 
+@app.route('/editar-direccion/<int:id_direccion>', methods=['GET', 'POST'])
+@rol_requerido(['Comprador'])
+def editar_direccion(id_direccion):
+    direccion = Direccion.query.get_or_404(id_direccion)
+    
+    if direccion.id_usuario != session['id_usuario']:
+        flash('No puedes editar direcciones de otros usuarios', 'danger')
+        return redirect(url_for('perfil'))
+    
+    if request.method == 'POST':
+        direccion.calle = request.form.get('calle')
+        direccion.ciudad = request.form.get('ciudad')
+        direccion.estado = request.form.get('estado')
+        direccion.codigo_postal = request.form.get('codigo_postal')
+        direccion.pais = request.form.get('pais')
+        direccion.es_predeterminada = request.form.get('es_predeterminada') == 'on'
+        
+        db.session.commit()
+        flash('Dirección actualizada exitosamente', 'success')
+        return redirect(url_for('perfil'))
+    
+    return render_template('editar_direccion.html', direccion=direccion)
+
+@app.route('/eliminar-direccion/<int:id_direccion>', methods=['POST'])
+@rol_requerido(['Comprador'])
+def eliminar_direccion(id_direccion):
+    direccion = Direccion.query.get_or_404(id_direccion)
+    
+    if direccion.id_usuario != session['id_usuario']:
+        flash('No puedes eliminar direcciones de otros usuarios', 'danger')
+        return redirect(url_for('perfil'))
+    
+    db.session.delete(direccion)
+    db.session.commit()
+    flash('Dirección eliminada', 'success')
+    return redirect(url_for('perfil'))
+
 @app.route('/agregar-metodo-pago', methods=['GET', 'POST'])
 @rol_requerido(['Comprador'])
 def agregar_metodo_pago():
     if request.method == 'POST':
         numero_tarjeta = request.form.get('numero_tarjeta')
         titular_tarjeta = request.form.get('titular_tarjeta')
+        tipo_tarjeta = request.form.get('tipo_tarjeta', 'credito')
         mes_vencimiento = request.form.get('mes_vencimiento')
         anio_vencimiento = request.form.get('anio_vencimiento')
         cvv = request.form.get('cvv')
         
-        # Validar CVV
         if not validar_cvv(cvv):
             flash('CVV inválido (debe tener 3 dígitos)', 'danger')
             return render_template('agregar_metodo_pago.html')
         
-        # Validar fecha de vencimiento
         valido, mensaje = validar_vencimiento_tarjeta(mes_vencimiento, anio_vencimiento)
         if not valido:
             flash(mensaje, 'danger')
@@ -621,6 +695,7 @@ def agregar_metodo_pago():
         
         metodo_pago = MetodoPago(
             id_usuario=session['id_usuario'],
+            tipo_tarjeta=tipo_tarjeta,
             ultimos4_tarjeta=numero_tarjeta[-4:],
             titular_tarjeta=titular_tarjeta,
             mes_vencimiento=int(mes_vencimiento),
@@ -635,6 +710,50 @@ def agregar_metodo_pago():
         return redirect(url_for('perfil'))
     
     return render_template('agregar_metodo_pago.html')
+
+@app.route('/editar-metodo-pago/<int:id_metodo>', methods=['GET', 'POST'])
+@rol_requerido(['Comprador'])
+def editar_metodo_pago(id_metodo):
+    metodo_pago = MetodoPago.query.get_or_404(id_metodo)
+    
+    if metodo_pago.id_usuario != session['id_usuario']:
+        flash('No puedes editar métodos de pago de otros usuarios', 'danger')
+        return redirect(url_for('perfil'))
+    
+    if request.method == 'POST':
+        metodo_pago.tipo_tarjeta = request.form.get('tipo_tarjeta', 'credito')
+        metodo_pago.titular_tarjeta = request.form.get('titular_tarjeta')
+        mes_vencimiento = request.form.get('mes_vencimiento')
+        anio_vencimiento = request.form.get('anio_vencimiento')
+        
+        valido, mensaje = validar_vencimiento_tarjeta(mes_vencimiento, anio_vencimiento)
+        if not valido:
+            flash(mensaje, 'danger')
+            return render_template('editar_metodo_pago.html', metodo_pago=metodo_pago)
+        
+        metodo_pago.mes_vencimiento = int(mes_vencimiento)
+        metodo_pago.anio_vencimiento = int(anio_vencimiento)
+        metodo_pago.es_predeterminado = request.form.get('es_predeterminado') == 'on'
+        
+        db.session.commit()
+        flash('Método de pago actualizado exitosamente', 'success')
+        return redirect(url_for('perfil'))
+    
+    return render_template('editar_metodo_pago.html', metodo_pago=metodo_pago)
+
+@app.route('/eliminar-metodo-pago/<int:id_metodo>', methods=['POST'])
+@rol_requerido(['Comprador'])
+def eliminar_metodo_pago(id_metodo):
+    metodo_pago = MetodoPago.query.get_or_404(id_metodo)
+    
+    if metodo_pago.id_usuario != session['id_usuario']:
+        flash('No puedes eliminar métodos de pago de otros usuarios', 'danger')
+        return redirect(url_for('perfil'))
+    
+    db.session.delete(metodo_pago)
+    db.session.commit()
+    flash('Método de pago eliminado', 'success')
+    return redirect(url_for('perfil'))
 
 @app.route('/historial-ordenes')
 @login_requerido
@@ -672,7 +791,6 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         
-        # Crear carpeta de uploads si no existe
         if not os.path.exists(app.config['UPLOAD_FOLDER']):
             os.makedirs(app.config['UPLOAD_FOLDER'])
     
