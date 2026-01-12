@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block titulo %}Carrito - Abarrotes Don Chuy{% endblock %}
+{% block contenido %}
+<h1 style="color: #2c3e50; margin-bottom: 2rem;">🛒 Mi Carrito</h1>
+{% if productos %}
+<div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <table class="tabla">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in productos %}
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <img src="{{ url_for('static', filename='uploads/' + item.producto.imagen) }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+                        <span>{{ item.producto.nombre }}</span>
+                    </div>
+                </td>
+                <td>${{ "%.2f"|format(item.producto.precio) }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td style="font-weight: bold; color: #27ae60;">${{ "%.2f"|format(item.producto.precio * item.cantidad) }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('eliminar_del_carrito', id_producto=item.producto.id) }}">
+                        <button type="submit" class="btn btn-peligro" style="padding: 0.5rem 1rem;">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div style="text-align: right; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e0e0e0;">
+        <h2 style="color: #2c3e50;">Total: <span style="color: #27ae60;">${{ "%.2f"|format(total) }}</span></h2>
+        <a href="{{ url_for('checkout') }}" class="btn btn-primario" style="margin-top: 1rem; padding: 1rem 2rem;">Proceder al Pago</a>
+    </div>
+</div>
+{% else %}
+<div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center;">
+    <div style="font-size: 4rem; margin-bottom: 1rem;">🛒</div>
+    <h2 style="color: #2c3e50; margin-bottom: 1rem;">Tu carrito está vacío</h2>
+    <p style="color: #7f8c8d; margin-bottom: 2rem;">Agrega productos para comenzar tu compra</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primario">Ver Productos</a>
+</div>
+{% endif %}
+{% endblock %}

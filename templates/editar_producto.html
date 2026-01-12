@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block titulo %}Editar Producto - Abarrotes Don Chuy{% endblock %}
+{% block contenido %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <h1 style="color: #2c3e50; margin-bottom: 2rem;">✏️ Editar Producto</h1>
+    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="grupo-formulario">
+                <label for="nombre">Nombre del Producto *</label>
+                <input type="text" id="nombre" name="nombre" class="control-formulario" value="{{ producto.nombre }}" required>
+            </div>
+            <div class="grupo-formulario">
+                <label for="descripcion">Descripción *</label>
+                <textarea id="descripcion" name="descripcion" class="control-formulario" required>{{ producto.descripcion }}</textarea>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="grupo-formulario">
+                    <label for="precio">Precio ($) *</label>
+                    <input type="number" id="precio" name="precio" class="control-formulario" step="0.01" min="0.01" value="{{ producto.precio }}" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label for="stock">Stock *</label>
+                    <input type="number" id="stock" name="stock" class="control-formulario" min="0" value="{{ producto.stock }}" required>
+                </div>
+            </div>
+            <div class="grupo-formulario">
+                <label>Imagen Actual</label>
+                <div style="margin-bottom: 1rem;">
+                    <img src="{{ url_for('static', filename='uploads/' + producto.imagen) }}" style="width: 200px; height: 200px; object-fit: cover; border-radius: 8px;">
+                </div>
+                <label for="imagen">Cambiar Imagen</label>
+                <input type="file" id="imagen" name="imagen" class="control-formulario" accept="image/*">
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primario" style="flex: 1;">Guardar Cambios</button>
+                <a href="{{ url_for('panel_vendedor') }}" class="btn btn-secundario">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

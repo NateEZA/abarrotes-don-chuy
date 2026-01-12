@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block titulo %}Crear Administrador - Abarrotes Don Chuy{% endblock %}
+
+{% block contenido %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <h1 style="color: #2c3e50; margin-bottom: 2rem;">👑 Crear Nuevo Administrador</h1>
+    
+    <div style="background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
+        <strong>⚠️ Privilegio Exclusivo:</strong> Solo Nate puede crear administradores.
+    </div>
+    
+    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <form method="POST">
+            <div class="grupo-formulario">
+                <label for="nombre_usuario">Nombre de Usuario *</label>
+                <input type="text" id="nombre_usuario" name="nombre_usuario" class="control-formulario" required>
+            </div>
+            
+            <div class="grupo-formulario">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" class="control-formulario" required>
+            </div>
+            
+            <div class="grupo-formulario">
+                <label for="contrasena">Contraseña *</label>
+                <input type="password" id="contrasena" name="contrasena" class="control-formulario" required>
+                <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">
+                    Mínimo 8 caracteres, 1 número y 1 símbolo
+                </small>
+            </div>
+            
+            <div class="grupo-formulario">
+                <label for="palabra_clave">Palabra Clave de Recuperación *</label>
+                <input type="text" id="palabra_clave" name="palabra_clave" class="control-formulario" required>
+                <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">
+                    Para recuperación de contraseña (mínimo 3 caracteres)
+                </small>
+            </div>
+            
+            <button type="submit" class="btn btn-primario btn-bloque">Crear Administrador</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

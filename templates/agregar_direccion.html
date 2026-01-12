@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block titulo %}Agregar Dirección - Abarrotes Don Chuy{% endblock %}
+{% block contenido %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <h1 style="color: #2c3e50; margin-bottom: 2rem;">📍 Agregar Nueva Dirección</h1>
+    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <form method="POST">
+            <div class="grupo-formulario">
+                <label for="calle">Calle y Número *</label>
+                <input type="text" id="calle" name="calle" class="control-formulario" placeholder="Ej: Av. Juárez 123" required>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="grupo-formulario">
+                    <label for="ciudad">Ciudad *</label>
+                    <input type="text" id="ciudad" name="ciudad" class="control-formulario" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label for="estado">Estado *</label>
+                    <input type="text" id="estado" name="estado" class="control-formulario" required>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="grupo-formulario">
+                    <label for="codigo_postal">Código Postal *</label>
+                    <input type="text" id="codigo_postal" name="codigo_postal" class="control-formulario" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label for="pais">País *</label>
+                    <input type="text" id="pais" name="pais" class="control-formulario" value="México" required>
+                </div>
+            </div>
+            <div class="grupo-formulario">
+                <label><input type="checkbox" name="es_predeterminado" style="margin-right: 0.5rem;">Establecer como predeterminada</label>
+            </div>
+            <div style="background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <strong>Nota:</strong> Puedes guardar hasta 2 direcciones.
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primario" style="flex: 1;">Guardar</button>
+                <a href="{{ url_for('perfil') }}" class="btn btn-secundario">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
